@@ -5,10 +5,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-Player *gambler = NULL;
-Player *dealer = NULL;
-Deck *deck = NULL;
-
 Card *generate_card(const Suit suit, const Value value) {
     Card *new_card = malloc(sizeof(Card));
     new_card->suit = suit;
@@ -304,7 +300,7 @@ GameState process_match_state(Player *gambler, Player *dealer, Action action) {
     }
 }
 
-void initialize_game() {
+void initialize_game(Deck *deck, Player *gambler, Player *dealer){
     srand(time(NULL));
 
     gambler = generate_player(GAMBLER);
@@ -359,8 +355,3 @@ size_t calculate_hand_score(const Hand *hand) {
 }
 
 
-void free_structs() {
-    free_player(gambler);
-    free_player(dealer);
-    free_deck(deck);
-}

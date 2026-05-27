@@ -73,13 +73,7 @@ typedef enum {
     TIE
 } GameState;
 
-extern Deck *deck;
-
-extern Player *gambler;
-extern Player *dealer;
-
-
-void initialize_game();
+void initialize_game(Deck *deck, Player *gambler, Player *dealer);
 GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action action);
 size_t calculate_hand_score(const Hand *hand);
 void free_structs();
