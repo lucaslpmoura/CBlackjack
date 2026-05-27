@@ -1,0 +1,70 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.3.20'
+    id 'application'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass = 'com.lucaslpmoura.JNI_Blackjack.Blackjack'
+}
+
+
+tasks.register("buildNative", Exec) {
+
+    doFirst {
+        mkdir("build/native")
+        mkdir("libs")
+    }
+
+    commandLine(
+            "gcc",
+            "-shared",
+            "-fPIC",
+            "-o",
+            "build/native/libblackjack.so",
+
+            "-I/usr/lib/jvm/java-21-openjdk/include/",
+            "-I/usr/lib/jvm/java-21-openjdk/include/linux",
+
+            "src/main/C/com_lucaslpmoura_JNI_Blackjack_CBlackjack.c",
+            "src/main/C/blackjack.c",
+            "src/main/C/JNI_conversion_funcs.c"
+    )
+}
+
+tasks.register("copyNativeLib", Copy) {
+
+    dependsOn("buildNative")
+
+    from("build/native")
+    include("*.so")
+
+    into("libs")
+}
+
+tasks.named("run", JavaExec) {
+
+    dependsOn("copyNativeLib")
+
+    jvmArgs(
+            "-Djava.library.path=${projectDir}/libs"
+    )
+}
