@@ -54,7 +54,7 @@ public class CBlackjack {
     }
 
     public native void initializeGame();
-    public native GameState processAction(Deck deck, Player gambler, Player dealer, Action action);
+    public native GameState processAction(Action action);
     public native int calculateHandScore(Hand hand);
     public native void freeStructs();
 }
