@@ -319,7 +319,7 @@ void initialize_game() {
 }
 
 
-GameState process_action(Action action) {
+GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action action) {
     switch (action) {
         case HIT:
             deal_card(deck, gambler);

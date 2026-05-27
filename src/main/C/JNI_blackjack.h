@@ -80,7 +80,7 @@ extern Player *dealer;
 
 
 void initialize_game();
-GameState process_action(Action action);
+GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action action);
 size_t calculate_hand_score(const Hand *hand);
 void free_structs();
 
