@@ -24,10 +24,9 @@ JNIEXPORT void JNICALL Java_com_lucaslpmoura_JNI_1Blackjack_CBlackjack_initializ
     initialize_game(deck, gambler, dealer);
 
 
-
     convert_deck_to_obj(env,deck, jdeck);
-    //jgambler = convert_player(env, jgambler, gambler);
-    //jdealer = convert_player(env, jdealer, dealer);
+    convert_player_to_obj(env, gambler, jgambler);
+    convert_player_to_obj(env, dealer, jdealer);
 
 }
 

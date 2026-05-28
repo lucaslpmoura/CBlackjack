@@ -37,9 +37,13 @@ public class Blackjack {
         CBlackjack.Player dealer = new CBlackjack.Player();
 
         lib.initializeGame(deck, gambler, dealer);
+
         System.out.println(deck.cards[10].suit);
         System.out.println(deck.cards[10].value);
         System.out.println(deck.cards[10].is_hidden);
+
+        System.out.println(gambler.role);
+        System.out.println(dealer.role);
 
 
     }

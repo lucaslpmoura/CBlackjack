@@ -150,8 +150,7 @@ void free_deck(Deck *deck) {
 }
 
 
-Hand *generate_hand(size_t hand_size) {
-    Hand *new_hand = malloc(sizeof(Hand));
+void generate_hand(Hand *new_hand, size_t hand_size) {
     new_hand->size = hand_size;
 
     new_hand->cards = (Card**) malloc(sizeof(Card*) * new_hand->size);
@@ -159,7 +158,6 @@ Hand *generate_hand(size_t hand_size) {
     for (size_t i = 0; i < new_hand->size; i++) {
         new_hand->cards[i] = NULL;
     }
-    return new_hand;
 }
 
 size_t calculate_card_score(const Card *card) {
@@ -237,12 +235,14 @@ size_t deal_hidden_card(Deck *deck, Player *player) {
     return add_card(player->hand, card, true);
 }
 
-Player *generate_player(Role role){
-    Player *new_player = malloc(sizeof(Player));
+void generate_player(Player *new_player, Role role){
     new_player->role = role;
-    new_player->hand = generate_hand(role);
+
+    Hand *new_hand = malloc(sizeof(Hand));
+    generate_hand(new_hand, role);
+    new_player->hand = new_hand;
+
     new_player->score = 0;
-    return new_player;
 }
 
 void calculate_player_score(Player *player) {
@@ -300,8 +300,8 @@ GameState process_match_state(Player *gambler, Player *dealer, Action action) {
 void initialize_game(Deck *deck, Player *gambler, Player *dealer){
     srand(time(NULL));
 
-    gambler = generate_player(GAMBLER);
-    dealer = generate_player(DEALER);
+    generate_player(gambler, GAMBLER);
+    generate_player(dealer, DEALER);
 
     generate_deck(deck);
     shuffle_deck(deck);

@@ -209,6 +209,7 @@ void convert_obj_to_hand(JNIEnv *env, Hand *hand, jobject jhand) {
 
 
 // DECK FUNTIONS
+void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
 void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
     if(deck == NULL) return;
 
@@ -280,7 +281,7 @@ void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
     (*env)->SetObjectField(env, jdeck, cardsField, jcards);
 
 };
-void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
+
 
 
 
@@ -290,7 +291,47 @@ void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
 
 // PLAYER FUNTIONS
 void convert_obj_to_player(JNIEnv *env, Player *player, jobject jplayer);
-void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer);
+void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
+    if(player == NULL) return;
+
+    jclass playerClass = (*env)->FindClass(
+         env,
+         "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Player"
+    );
+
+    //Role
+    jfieldID roleField = (*env)->GetFieldID(
+        env,
+        playerClass,
+        "role",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Role;"
+    );
+    jclass roleClass = (*env)->FindClass(
+        env,
+        "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Role"
+    );
+
+    jmethodID valuesMethod = (*env)->GetStaticMethodID(
+       env,
+       roleClass,
+       "values",
+       "()[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Role;"
+    );
+
+    jobjectArray roleValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, roleClass, valuesMethod);
+
+
+    /*
+        This is needed beacause the GAMBLER enum evaluates to 2 in C, but 0 in Java.
+        DEALER is 5 in C, but 1 in Java.
+    */
+    char pos = 0;
+    if(player->role == 5){
+        pos = 1;
+    }
+    jobject jrole = (*env)->GetObjectArrayElement(env, roleValues, pos);
+    (*env)->SetObjectField(env, jplayer, roleField, jrole);
+}
 
 
 

@@ -19,7 +19,7 @@ public class CBlackjack {
     }
 
     public static enum Role {
-        GAMBLER, DEALER
+        DEALER, GAMBLER
     }
 
     public static enum GameState{
