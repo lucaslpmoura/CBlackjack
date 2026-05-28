@@ -101,6 +101,47 @@ void convert_card_to_obj(JNIEnv *env, Card *card, jobject jcard) {
     jobject jsuit = (*env)->GetObjectArrayElement(env, suitValues, card->suit);
     (*env)->SetObjectField(env, jcard, suitField, jsuit);
 
+    //Value
+    jfieldID valueField = (*env)->GetFieldID(
+        env,
+        cardClass,
+        "value",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Value;"
+    );
+    jclass valueClass = (*env)->FindClass(
+        env,
+        "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Value"
+    );
+
+    valuesMethod = (*env)->GetStaticMethodID(
+       env,
+       valueClass,
+       "values",
+       "()[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Value;"
+    );
+
+    jobjectArray valueValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, valueClass, valuesMethod);
+    jobject jvalue = (*env)->GetObjectArrayElement(env, valueValues, card->value);
+    (*env)->SetObjectField(env, jcard, valueField, jvalue);
+
+    //next -- deck conversion should handle this
+    jfieldID nextField = (*env)->GetFieldID(
+        env,
+        cardClass,
+        "next",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+    (*env)->SetObjectField(env, jcard, nextField, NULL);
+
+    //is_hidden
+    jfieldID is_hiddenField = (*env)->GetFieldID(
+        env,
+        cardClass,
+        "is_hidden",
+        "Z" //boolean
+    );
+    (*env)->SetBooleanField(env, jcard, is_hiddenField, (bool)card->is_hidden);
+
 }
 
 
