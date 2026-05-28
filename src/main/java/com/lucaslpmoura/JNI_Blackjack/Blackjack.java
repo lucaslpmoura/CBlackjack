@@ -45,6 +45,9 @@ public class Blackjack {
         System.out.println(gambler.role);
         System.out.println(dealer.role);
 
+        System.out.println(gambler.hand.cards[0].suit);
+        System.out.println(dealer.hand.cards[0].value);
+
 
     }
 }

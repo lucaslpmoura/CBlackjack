@@ -201,7 +201,50 @@ void convert_obj_to_hand(JNIEnv *env, Hand *hand, jobject jhand) {
 
 }
 
+void convert_hand_to_obj(JNIEnv *env, Hand *hand, jobject jhand){
+    if(hand == NULL) return;
 
+    jclass handClass = (*env)->GetObjectClass(env, jhand);
+
+    //size
+    jfieldID sizeField = (*env)->GetFieldID(
+        env,
+        handClass,
+        "size",
+        "I" // int
+    );
+
+    (*env)->SetIntField(env, handClass, sizeField, hand->size);
+
+    //num_of_cards
+       jfieldID num_of_cardsField = (*env)->GetFieldID(
+           env,
+           handClass,
+          "num_of_cards",
+          "C" // Char
+       );
+
+       (*env)->SetIntField(env, jhand, num_of_cardsField, hand->num_of_cards);
+
+    //cards
+    jfieldID cardsField = (*env)->GetFieldID(
+        env,
+        handClass,
+        "cards",
+        "[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+    jclass cardClass = (*env)->FindClass(env,  "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Card");
+    jobjectArray jcards = (*env)->NewObjectArray(env, hand->size, cardClass, NULL);
+
+    for(int i = 0; i < hand->num_of_cards; i++){
+        jobject jcard = (*env)->AllocObject(env, cardClass);
+        convert_card_to_obj(env, hand->cards[i], jcard);
+        (*env)->SetObjectArrayElement(env, jcards, i, jcard);
+    }
+
+    (*env)->SetObjectField(env, jhand, cardsField, jcards);
+
+}
 
 
 
@@ -322,7 +365,7 @@ void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
 
 
     /*
-        This is needed beacause the GAMBLER enum evaluates to 2 in C, but 0 in Java.
+        This is needed because the GAMBLER enum evaluates to 2 in C, but 0 in Java.
         DEALER is 5 in C, but 1 in Java.
     */
     char pos = 0;
@@ -331,6 +374,23 @@ void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
     }
     jobject jrole = (*env)->GetObjectArrayElement(env, roleValues, pos);
     (*env)->SetObjectField(env, jplayer, roleField, jrole);
+
+    //Hand
+    jfieldID handField = (*env)->GetFieldID(
+        env,
+        playerClass,
+        "hand",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Hand;"
+    );
+    jclass handClass = (*env)->FindClass(
+        env,
+        "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Hand"
+    );
+    jobject jhand = (*env)->AllocObject(env, handClass);
+
+    convert_hand_to_obj(env, player->hand, jhand);
+
+    (*env)->SetObjectField(env, jplayer, handField, jhand);
 }
 
 
