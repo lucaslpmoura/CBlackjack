@@ -63,8 +63,7 @@ void print_card(const Card *card) {
     free(value);
 }
 
-Deck *generate_deck() {
-    Deck *new_deck = malloc(sizeof(Deck));
+void *generate_deck(Deck *new_deck) {
     new_deck->top_card = NULL;
     new_deck->size = 0;
 
@@ -79,9 +78,7 @@ Deck *generate_deck() {
             new_deck->size++;
         }
     }
-
     return new_deck;
-
 }
 
 Deck *generate_aces_deck() {
@@ -306,7 +303,7 @@ void initialize_game(Deck *deck, Player *gambler, Player *dealer){
     gambler = generate_player(GAMBLER);
     dealer = generate_player(DEALER);
 
-    deck = generate_deck();
+    generate_deck(deck);
     shuffle_deck(deck);
 
     deal_card(deck, dealer);

@@ -14,15 +14,15 @@ public class CBlackjack {
         TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN,
         JACK, QUEEN, KING
     }
-    public enum Action {
+    public static enum Action {
         HIT, STAND, FOLD
     }
 
-    public enum Role {
+    public static enum Role {
         GAMBLER, DEALER
     }
 
-    public enum GameState{
+    public static enum GameState{
         NOT_FINISHED, GAMBLER_WINS, DEALER_WINS, TIE
     }
     public static class Card {
@@ -38,7 +38,6 @@ public class CBlackjack {
         public int size;
         public Card[] cards = new Card[MAX_DECK_SIZE];
         public Card top_card;
-        public char num_of_cards;
     }
 
     public static class Hand{

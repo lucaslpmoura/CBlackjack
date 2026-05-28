@@ -32,5 +32,13 @@ public class Blackjack {
 
         System.out.println("Score: " + score);
 
+        CBlackjack.Deck deck = new CBlackjack.Deck();
+        CBlackjack.Player gambler = new CBlackjack.Player();
+        CBlackjack.Player dealer = new CBlackjack.Player();
+
+        lib.initializeGame(deck, gambler, dealer);
+        System.out.println(deck.top_card.suit);
+
+
     }
 }

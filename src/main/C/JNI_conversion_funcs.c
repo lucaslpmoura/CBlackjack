@@ -4,10 +4,8 @@
 
 #include "JNI_conversion_funcs.h"
 
-Card *convert_card(JNIEnv *env, jobject jcard){
-    if(jcard == NULL) return NULL;
-
-    Card *card = malloc(sizeof(Card));
+void convert_obj_to_card(JNIEnv *env, Card *card, jobject jcard){
+    if(jcard == NULL) return;
 
     jclass cardClass = (*env)->GetObjectClass(env, jcard);
 
@@ -57,7 +55,6 @@ Card *convert_card(JNIEnv *env, jobject jcard){
     card->value = (Value)valueOrdinal;
 
     // is_hidden
-
     jfieldID is_hiddenField = (*env)->GetFieldID(
         env,
         cardClass,
@@ -69,15 +66,51 @@ Card *convert_card(JNIEnv *env, jobject jcard){
 
     card->is_hidden = (bool)hidden;
 
+    //next - let the deck conversion handle this
     card->next = NULL;
-
-    return card;
 }
 
-Hand *convert_hand(JNIEnv *env, jobject jhand) {
-    if(jhand == NULL) return NULL;
+void convert_card_to_obj(JNIEnv *env, Card *card, jobject jcard) {
 
-    Hand *hand = malloc(sizeof(Hand));
+    jclass cardClass = (*env)->FindClass(
+        env,
+        "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Card"
+    );
+
+    //Suit
+    jfieldID suitField = (*env)->GetFieldID(
+        env,
+        cardClass,
+        "suit",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Suit;"
+    );
+    jclass suitClass = (*env)->FindClass(
+        env,
+        "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Suit"
+    );
+
+    jmethodID valuesMethod = (*env)->GetStaticMethodID(
+       env,
+       suitClass,
+       "values",
+       "()[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Suit;"
+    );
+
+
+    jobjectArray suitValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, suitClass, valuesMethod);
+    jobject jsuit = (*env)->GetObjectArrayElement(env, suitValues, card->suit);
+    (*env)->SetObjectField(env, jcard, suitField, jsuit);
+
+}
+
+
+
+
+
+
+// HAND FUNCTIONS
+void convert_obj_to_hand(JNIEnv *env, Hand *hand, jobject jhand) {
+    if(jhand == NULL) return;
 
     jclass handClass = (*env)->GetObjectClass(env, jhand);
 
@@ -119,11 +152,109 @@ Hand *convert_hand(JNIEnv *env, jobject jhand) {
     hand->cards = malloc(sizeof(Card) * len);
     for(char i = 0; i < len; i++){
         jobject jcard = (*env)->GetObjectArrayElement(env, jcards, i);
-        hand->cards[i] = convert_card(env, jcard);
+
+        Card *card = malloc(sizeof(Card));
+        convert_obj_to_card(env, card, jcard);
+        hand->cards[i] = card;
     }
 
-    return hand;
 }
-Deck *convert_deck();
-Player *convert_player();
-Action *convert_action();
+
+
+
+
+
+
+
+
+// DECK FUNTIONS
+void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
+    if(deck == NULL) return;
+
+
+    jclass deckClass = (*env)->FindClass(
+            env,
+            "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Deck"
+    );
+
+    //size
+    jfieldID sizeField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "size",
+        "I"
+    );
+    //cards
+    jfieldID cardsField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "cards",
+        "[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+    //top_card
+    jfieldID top_cardField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "top_card",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+
+    (*env)->SetIntField(env, jdeck, sizeField, deck->size);
+
+    jclass cardClass = (*env)->FindClass(env,  "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Card");
+
+    jobject jtop_card = (*env)->AllocObject(env, cardClass);
+    convert_card_to_obj(env, deck->cards[0], jtop_card);
+    (*env)->SetObjectField(env, jdeck, top_cardField, jtop_card);
+
+
+
+
+    jobjectArray jcards = (*env)->NewObjectArray(env, deck->size, cardClass, NULL);
+
+
+
+    jfieldID nextField = (*env)->GetFieldID(
+        env,
+        cardClass,
+        "next",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+    jobject jlast_card = NULL;
+
+
+    for(int i = 0; i < deck->size; i++){
+        jobject jcard = (*env)->AllocObject(env, cardClass);
+
+        convert_card_to_obj(env, deck->cards[i], jcard);
+
+        if(jlast_card != NULL){
+            (*env)->SetObjectField(env, jlast_card, nextField, jcard);
+        }
+
+        (*env)->SetObjectArrayElement(env, jcards, i, jcard);
+        jlast_card = jcard;
+    }
+
+    (*env)->SetObjectField(env, jdeck, cardsField, jcards);
+
+};
+void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
+
+
+
+
+
+
+
+// PLAYER FUNTIONS
+void convert_obj_to_player(JNIEnv *env, Player *player, jobject jplayer);
+void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer);
+
+
+
+
+
+
+// ACTION FUNCTIONS
+void convert_action();

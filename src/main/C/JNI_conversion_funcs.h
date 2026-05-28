@@ -3,10 +3,21 @@
 
 #include "JNI_blackjack.h"
 
-Card *convert_card(JNIEnv *env, jobject jcard);
-Hand *convert_hand(JNIEnv *env, jobject jhand);
-Deck *convert_deck();
-Player *convert_player();
-Action *convert_action();
+void convert_card_to_obj(JNIEnv *env, Card *card, jobject jcard);
+void convert_obj_to_card(JNIEnv *env, Card *card, jobject jcard);
+
+
+
+void convert_obj_to_hand(JNIEnv *env, Hand *hand, jobject jhand);
+
+
+void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck);
+void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
+
+void convert_obj_to_player(JNIEnv *env, Player *plater, jobject jplayer);
+void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer);
+
+void convert_obj_to_action(JNIEnv *env, Action *action, jobject jaction);
+void convert_action_to_obj(JNIEnv *env, Action *action, jobject jaction);
 
 #endif
