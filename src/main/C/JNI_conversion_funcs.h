@@ -17,7 +17,9 @@ void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
 void convert_obj_to_player(JNIEnv *env, Player *plater, jobject jplayer);
 void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer);
 
-void convert_obj_to_action(JNIEnv *env, Action *action, jobject jaction);
+Action convert_obj_to_action(JNIEnv *env, jobject jaction);
 void convert_action_to_obj(JNIEnv *env, Action *action, jobject jaction);
+
+jobject convert_state_to_obj(JNIEnv *env, GameState state);
 
 #endif

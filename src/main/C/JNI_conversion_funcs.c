@@ -252,7 +252,54 @@ void convert_hand_to_obj(JNIEnv *env, Hand *hand, jobject jhand){
 
 
 // DECK FUNTIONS
-void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck);
+void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck){
+    jclass deckClass = (*env)->GetObjectClass(env, jdeck);
+
+    //size
+    jfieldID sizeField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "size",
+        "I"
+    );
+    //cards
+    jfieldID cardsField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "cards",
+        "[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+    //top_card
+    jfieldID top_cardField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "top_card",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
+    );
+
+    deck->size = (size_t) (*env)->GetIntField(env, jdeck, sizeField);
+
+    jobjectArray jcards = (jobjectArray) (*env)->GetObjectField(env, jdeck, cardsField);
+    jsize len = (*env)->GetArrayLength(env, jcards);
+
+    Card *last_card = NULL;
+    for(char i = 0; i < len; i++){
+        jobject jcard = (*env)->GetObjectArrayElement(env, jcards, i);
+
+        Card *card = malloc(sizeof(Card));
+        convert_obj_to_card(env, card, jcard);
+
+        if(i == 0){
+            deck->top_card = card;
+        }
+
+        if(last_card != NULL){
+            last_card->next = card;
+        }
+        deck->cards[i] = card;
+        last_card = card;
+    }
+}
 void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
     if(deck == NULL) return;
 
@@ -333,7 +380,43 @@ void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
 
 
 // PLAYER FUNTIONS
-void convert_obj_to_player(JNIEnv *env, Player *player, jobject jplayer);
+void convert_obj_to_player(JNIEnv *env, Player *player, jobject jplayer) {
+
+    jclass playerClass = (*env)->GetObjectClass(env, jplayer);
+
+    //Role
+    jfieldID roleField = (*env)->GetFieldID(
+        env,
+        playerClass,
+        "role",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Role;"
+    );
+    jclass roleClass = (*env)->FindClass(
+         env,
+         "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Role"
+    );
+    jmethodID roleOrdinalMethod = (*env)->GetMethodID(env, roleClass, "ordinal", "()I");
+    jobject jrole = (*env)->GetObjectField(env, jplayer, roleField);
+    jint roleOrdinal = (*env)->CallIntMethod(env, jrole, roleOrdinalMethod);
+
+    //Hand
+    jfieldID handField = (*env)->GetFieldID(
+        env,
+        playerClass,
+        "hand",
+        "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Hand;"
+    );
+
+    jobject jhand = (*env)->GetObjectField(env, jplayer, handField);
+
+    Hand *hand = malloc(sizeof(Hand));
+
+    convert_obj_to_hand(env, hand, jhand);
+
+
+    player->role = (Role) roleOrdinal;
+    player->hand = hand;
+}
 void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
     if(player == NULL) return;
 
@@ -399,4 +482,35 @@ void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
 
 
 // ACTION FUNCTIONS
-void convert_action();
+Action convert_obj_to_action(JNIEnv *env, jobject jaction){
+    jclass actionClass = (*env)->GetObjectClass(env, jaction);
+
+    jmethodID ordinalMethod = (*env)->GetMethodID(env, actionClass, "ordinal", "()I");
+
+    jint actionOrdinal = (*env)->CallIntMethod(env, jaction, ordinalMethod);
+
+    return (Action) actionOrdinal;
+}
+
+// GAMESTATE FUNCTIONS
+
+jobject convert_state_to_obj(JNIEnv *env, GameState state){
+    if(state == NULL) return NULL;
+
+    jclass stateClass = (*env)->FindClass(
+         env,
+         "com/lucaslpmoura/JNI_Blackjack/CBlackjack$GameState"
+    );
+
+    jmethodID valuesMethod = (*env)->GetStaticMethodID(
+        env,
+        stateClass,
+        "values",
+        "()[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$GameState;"
+    );
+
+    jobjectArray stateValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, stateClass, valuesMethod);
+    jobject jstate = (*env)->GetObjectArrayElement(env, stateValues, state);
+
+    return jstate;
+}
