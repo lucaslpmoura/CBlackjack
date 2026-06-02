@@ -73,9 +73,12 @@ typedef enum {
     TIE
 } GameState;
 
+size_t calculate_hand_score(const Hand *hand);
 void initialize_game(Deck *deck, Player *gambler, Player *dealer);
 GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action action);
-size_t calculate_hand_score(const Hand *hand);
-void free_structs();
+
+void free_hand(Hand *hand);
+void free_player(Player *player);
+void free_deck(Deck *deck);
 
 #endif //BLACKJACKLIB_JNI_BLACKJACK_H
