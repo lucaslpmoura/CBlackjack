@@ -1,53 +1,81 @@
 package com.lucaslpmoura.JNI_Blackjack;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Blackjack {
 
 
 
     public static void main(String args[]){
-
-        CBlackjack.Card card1 = new CBlackjack.Card();
-        CBlackjack.Card card2 = new CBlackjack.Card();
-
-        card1.suit = CBlackjack.Suit.CLUBS;
-        card1.value = CBlackjack.Value.ACE;
-        card1.is_hidden = false;
-
-        card2.suit = CBlackjack.Suit.DIAMONDS;
-        card2.value = CBlackjack.Value.FOUR;
-        card2.is_hidden = false;
-
-        CBlackjack.Hand hand = new CBlackjack.Hand();
-        hand.size = 2;
-        hand.cards = new CBlackjack.Card[hand.size];
-        hand.cards[0] = card1;
-        hand.cards[1] = card2;
-        hand.num_of_cards = 2;
-
-        System.loadLibrary("blackjack");
-        var lib = new CBlackjack();
-        int score = lib.calculateHandScore(hand);
-
-        System.out.println("Score: " + score);
-
         CBlackjack.Deck deck = new CBlackjack.Deck();
         CBlackjack.Player gambler = new CBlackjack.Player();
         CBlackjack.Player dealer = new CBlackjack.Player();
+        CBlackjack.GameState state = CBlackjack.GameState.NOT_FINISHED;
 
+        CBlackjack lib = new CBlackjack();
         lib.initializeGame(deck, gambler, dealer);
 
-        System.out.println(deck.cards[10].suit);
-        System.out.println(deck.cards[10].value);
-        System.out.println(deck.cards[10].is_hidden);
+        String op = "";
+        CBlackjack.Action action = CBlackjack.Action.STAND;
+        Scanner sc = new Scanner(System.in);
 
-        System.out.println(gambler.role);
-        System.out.println(dealer.role);
+        while(state == CBlackjack.GameState.NOT_FINISHED){
+            print_hand(dealer.hand, lib);
+            print_hand(gambler.hand, lib);
+            System.out.println("(H)it, (S)tand or (F)old? ");
+            op = sc.next();
 
-        System.out.println(gambler.hand.cards[0].suit);
-        System.out.println(dealer.hand.cards[0].value);
+            switch (op){
+                case "H" -> action = CBlackjack.Action.HIT;
+                case "S" -> action = CBlackjack.Action.STAND;
+                case "F" -> action = CBlackjack.Action.FOLD;
+            }
 
+            state = lib.processAction(deck, gambler, dealer, action);
 
+        }
+
+        print_hand(dealer.hand, lib);
+        print_hand(gambler.hand, lib);
+        System.out.println("Result is: " + state.ordinal());
+    }
+
+    static void print_hand(CBlackjack.Hand hand, CBlackjack lib) {
+        System.out.println("Score: " + lib.calculateHandScore(hand));
+        for (int i = 0; i < hand.num_of_cards; i++) {
+            print_card(hand.cards[i]);
+        }
+    }
+
+    static void print_card (CBlackjack.Card card){
+        if(card.is_hidden){
+            System.out.println("X  X\n\nX  X");
+        }else{
+            System.out.println(value_to_string(card.value)  + "  " + suit_to_string(card.suit) + "\n\n" + suit_to_string(card.suit) + "  " + value_to_string(card.value));
+        }
+
+        System.out.println("\n");
+    }
+
+    static String value_to_string(CBlackjack.Value value){
+        switch (value){
+            case ACE -> {return "A";}
+            case JACK -> {return "J";}
+            case QUEEN -> {return "QUEEN";}
+            case KING  -> {return  "KING";}
+            default -> {
+                return String.valueOf(value.ordinal() + 1);
+            }
+        }
+    }
+
+    static String suit_to_string(CBlackjack.Suit suit){
+        return switch (suit) {
+            case DIAMONDS -> "♢";
+            case CLUBS -> "♧";
+            case HEARTS -> "♡";
+            case SPADES -> "♤";
+        };
     }
 }
