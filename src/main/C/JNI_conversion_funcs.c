@@ -4,6 +4,7 @@
 
 #include "JNI_conversion_funcs.h"
 
+int i = 0;
 void convert_obj_to_card(JNIEnv *env, Card *card, jobject jcard){
     if(jcard == NULL) return;
 
@@ -95,7 +96,6 @@ void convert_card_to_obj(JNIEnv *env, Card *card, jobject jcard) {
        "values",
        "()[Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Suit;"
     );
-
 
     jobjectArray suitValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, suitClass, valuesMethod);
     jobject jsuit = (*env)->GetObjectArrayElement(env, suitValues, card->suit);
@@ -471,9 +471,11 @@ void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
     );
     jobject jhand = (*env)->AllocObject(env, handClass);
 
+
     convert_hand_to_obj(env, player->hand, jhand);
 
     (*env)->SetObjectField(env, jplayer, handField, jhand);
+
 }
 
 

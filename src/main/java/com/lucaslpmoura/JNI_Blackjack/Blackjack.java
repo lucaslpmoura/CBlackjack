@@ -13,6 +13,7 @@ public class Blackjack {
         CBlackjack.Player dealer = new CBlackjack.Player();
         CBlackjack.GameState state = CBlackjack.GameState.NOT_FINISHED;
 
+        System.loadLibrary("blackjack");
         CBlackjack lib = new CBlackjack();
         lib.initializeGame(deck, gambler, dealer);
 

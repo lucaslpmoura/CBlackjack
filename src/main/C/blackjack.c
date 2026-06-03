@@ -152,6 +152,7 @@ void free_deck(Deck *deck) {
 
 void generate_hand(Hand *new_hand, size_t hand_size) {
     new_hand->size = hand_size;
+    new_hand->num_of_cards = 0;
 
     new_hand->cards = (Card**) malloc(sizeof(Card*) * new_hand->size);
 
@@ -299,6 +300,7 @@ GameState process_match_state(Player *gambler, Player *dealer, Action action) {
 
 void initialize_game(Deck *deck, Player *gambler, Player *dealer){
     srand(time(NULL));
+
 
     generate_player(gambler, GAMBLER);
     generate_player(dealer, DEALER);
