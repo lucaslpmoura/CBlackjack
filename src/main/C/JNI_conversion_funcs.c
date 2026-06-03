@@ -507,7 +507,7 @@ Action convert_obj_to_action(JNIEnv *env, jobject jaction){
 
 jobject convert_state_to_obj(JNIEnv *env, GameState state){
 
-    if(state != HIT && state  != STAND && state != FOLD){
+    if(state != TIE && state  != GAMBLER_WINS && state != DEALER_WINS && state != NOT_FINISHED){
         return NULL;
     }
 
