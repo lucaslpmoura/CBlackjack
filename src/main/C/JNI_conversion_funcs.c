@@ -188,15 +188,17 @@ void convert_obj_to_hand(JNIEnv *env, Hand *hand, jobject jhand) {
     );
 
     jobjectArray jcards = (jobjectArray) (*env)->GetObjectField(env, jhand, cardsField);
-    jsize len = (*env)->GetArrayLength(env, jcards);
 
-    hand->cards = malloc(sizeof(Card) * len);
-    for(char i = 0; i < len; i++){
+    hand->cards = malloc(sizeof(Card) * hand->size);
+    for(char i = 0; i < hand->num_of_cards; i++){
         jobject jcard = (*env)->GetObjectArrayElement(env, jcards, i);
 
         Card *card = malloc(sizeof(Card));
         convert_obj_to_card(env, card, jcard);
         hand->cards[i] = card;
+    }
+    for(char i = hand->num_of_cards; i < hand->size; i++){
+        hand->cards[i] = NULL;
     }
 
 }
@@ -214,7 +216,7 @@ void convert_hand_to_obj(JNIEnv *env, Hand *hand, jobject jhand){
         "I" // int
     );
 
-    (*env)->SetIntField(env, handClass, sizeField, hand->size);
+    (*env)->SetIntField(env, jhand, sizeField, hand->size);
 
     //num_of_cards
        jfieldID num_of_cardsField = (*env)->GetFieldID(
@@ -236,10 +238,16 @@ void convert_hand_to_obj(JNIEnv *env, Hand *hand, jobject jhand){
     jclass cardClass = (*env)->FindClass(env,  "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Card");
     jobjectArray jcards = (*env)->NewObjectArray(env, hand->size, cardClass, NULL);
 
+
     for(int i = 0; i < hand->num_of_cards; i++){
         jobject jcard = (*env)->AllocObject(env, cardClass);
         convert_card_to_obj(env, hand->cards[i], jcard);
         (*env)->SetObjectArrayElement(env, jcards, i, jcard);
+
+    }
+
+    for(int i = hand->num_of_cards; i < hand->size; i++){
+        (*env)->SetObjectArrayElement(env, jcards, i, NULL);
     }
 
     (*env)->SetObjectField(env, jhand, cardsField, jcards);
@@ -446,6 +454,7 @@ void convert_player_to_obj(JNIEnv *env, Player *player, jobject jplayer){
 
     jobjectArray roleValues = (jobjectArray)(*env)->CallStaticObjectMethod(env, roleClass, valuesMethod);
 
+    int len = (*env)->GetArrayLength(env, roleValues);
 
     /*
         This is needed because the GAMBLER enum evaluates to 2 in C, but 0 in Java.
@@ -497,7 +506,10 @@ Action convert_obj_to_action(JNIEnv *env, jobject jaction){
 // GAMESTATE FUNCTIONS
 
 jobject convert_state_to_obj(JNIEnv *env, GameState state){
-    if(state == NULL) return NULL;
+
+    if(state != HIT && state  != STAND && state != FOLD){
+        return NULL;
+    }
 
     jclass stateClass = (*env)->FindClass(
          env,

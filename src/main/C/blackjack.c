@@ -325,7 +325,9 @@ GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action act
         case FOLD:
         default:
     }
-    return process_match_state(gambler, dealer, action);
+
+    GameState state = process_match_state(gambler, dealer, action);
+    return state;
 }
 
 size_t calculate_hand_score(const Hand *hand) {

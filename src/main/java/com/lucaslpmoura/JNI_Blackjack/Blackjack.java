@@ -22,7 +22,9 @@ public class Blackjack {
         Scanner sc = new Scanner(System.in);
 
         while(state == CBlackjack.GameState.NOT_FINISHED){
+            System.out.println("DEALER");
             print_hand(dealer.hand, lib);
+            System.out.println("GAMBLER");
             print_hand(gambler.hand, lib);
             System.out.println("(H)it, (S)tand or (F)old? ");
             op = sc.next();
@@ -32,14 +34,13 @@ public class Blackjack {
                 case "S" -> action = CBlackjack.Action.STAND;
                 case "F" -> action = CBlackjack.Action.FOLD;
             }
-
             state = lib.processAction(deck, gambler, dealer, action);
-
         }
 
+        sc.close();
         print_hand(dealer.hand, lib);
         print_hand(gambler.hand, lib);
-        System.out.println("Result is: " + state.ordinal());
+        print_game_state(state);
     }
 
     static void print_hand(CBlackjack.Hand hand, CBlackjack lib) {
@@ -63,8 +64,8 @@ public class Blackjack {
         switch (value){
             case ACE -> {return "A";}
             case JACK -> {return "J";}
-            case QUEEN -> {return "QUEEN";}
-            case KING  -> {return  "KING";}
+            case QUEEN -> {return "Q";}
+            case KING  -> {return  "K";}
             default -> {
                 return String.valueOf(value.ordinal() + 1);
             }
@@ -78,5 +79,24 @@ public class Blackjack {
             case HEARTS -> "♡";
             case SPADES -> "♤";
         };
+    }
+
+    static void print_game_state(CBlackjack.GameState state){
+        String s = "";
+        switch (state){
+            case NOT_FINISHED -> {
+                s = "The game is ongoing!";
+            }
+            case GAMBLER_WINS -> {
+                s = "The gambler has won!";
+            }
+            case DEALER_WINS -> {
+                s = "The house wins.";
+            }
+            case TIE -> {
+                s = "It is a tie!";
+            }
+        }
+        System.out.println(s);
     }
 }

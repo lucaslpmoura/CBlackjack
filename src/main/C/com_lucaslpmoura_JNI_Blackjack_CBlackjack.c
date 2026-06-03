@@ -3,6 +3,12 @@
 
 #include <stdlib.h>
 
+#define CHECK_EXCEPTION() \
+    if ((*env)->ExceptionCheck(env)) { \
+        (*env)->ExceptionDescribe(env); \
+        return NULL; \
+    }
+
 JNIEXPORT jint JNICALL Java_com_lucaslpmoura_JNI_1Blackjack_CBlackjack_calculateHandScore
 (JNIEnv *env, jobject this, jobject jhand) {
     Hand *hand = malloc(sizeof(Hand));
@@ -27,6 +33,7 @@ JNIEXPORT void JNICALL Java_com_lucaslpmoura_JNI_1Blackjack_CBlackjack_initializ
 
     initialize_game(deck, gambler, dealer);
 
+
     convert_deck_to_obj(env,deck, jdeck);
     convert_player_to_obj(env, gambler, jgambler);
     convert_player_to_obj(env, dealer, jdealer);
@@ -50,15 +57,21 @@ JNIEXPORT jobject JNICALL Java_com_lucaslpmoura_JNI_1Blackjack_CBlackjack_proces
     convert_obj_to_player(env, gambler, jgambler);
     convert_obj_to_player(env, dealer, jdealer);
 
+
     GameState game_state = process_action(deck, gambler, dealer, action);
 
+
     convert_deck_to_obj(env, deck, jdeck);
+
     convert_player_to_obj(env, gambler, jgambler);
+
     convert_player_to_obj(env, dealer, jdealer);
 
     free_deck(deck);
     free_player(gambler);
     free_player(dealer);
+
+
 
     jobject jstate = convert_state_to_obj(env, game_state);
 

@@ -61,7 +61,7 @@ tasks.register("copyNativeLib", Copy) {
 }
 
 tasks.named("run", JavaExec) {
-
+    standardInput = System.in
     dependsOn("copyNativeLib")
 
     jvmArgs(
