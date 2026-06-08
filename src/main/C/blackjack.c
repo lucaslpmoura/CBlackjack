@@ -290,7 +290,7 @@ GameState process_match_state(Player *gambler, Player *dealer, Action action) {
             }
             if (
                 gambler->score > BLACKJACK ||
-                dealer->score < BLACKJACK && dealer->score > gambler->score
+                dealer->score <= BLACKJACK && dealer->score > gambler->score
                 ) {
                 return DEALER_WINS;
                 }else {
