@@ -218,6 +218,8 @@ void convert_hand_to_obj(JNIEnv *env, Hand *hand, jobject jhand){
 
     (*env)->SetIntField(env, jhand, sizeField, hand->size);
 
+
+
     //num_of_cards
        jfieldID num_of_cardsField = (*env)->GetFieldID(
            env,
@@ -284,11 +286,23 @@ void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck){
         "top_card",
         "Lcom/lucaslpmoura/JNI_Blackjack/CBlackjack$Card;"
     );
+    //top_card_idx
+    jfieldID top_card_idxField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "top_card_idx",
+        "I"
+    );
 
     deck->size = (size_t) (*env)->GetIntField(env, jdeck, sizeField);
 
+    deck->top_card_idx = (int) (*env)->GetIntField(env, jdeck, top_card_idxField);
+
     jobjectArray jcards = (jobjectArray) (*env)->GetObjectField(env, jdeck, cardsField);
     jsize len = (*env)->GetArrayLength(env, jcards);
+
+
+
 
     Card *last_card = NULL;
     for(char i = 0; i < len; i++){
@@ -297,17 +311,17 @@ void convert_obj_to_deck(JNIEnv *env, Deck *deck, jobject jdeck){
         Card *card = malloc(sizeof(Card));
         convert_obj_to_card(env, card, jcard);
 
-        if(i == 0){
-            deck->top_card = card;
-        }
-
         if(last_card != NULL){
             last_card->next = card;
         }
         deck->cards[i] = card;
         last_card = card;
     }
+
+    deck->top_card = deck->cards[deck->top_card_idx];
+
 }
+
 void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
     if(deck == NULL) return;
 
@@ -322,6 +336,13 @@ void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
         env,
         deckClass,
         "size",
+        "I"
+    );
+    //top_card_idx
+    jfieldID top_card_idxField = (*env)->GetFieldID(
+        env,
+        deckClass,
+        "top_card_idx",
         "I"
     );
     //cards
@@ -341,13 +362,13 @@ void convert_deck_to_obj(JNIEnv *env, Deck *deck, jobject jdeck){
 
     (*env)->SetIntField(env, jdeck, sizeField, deck->size);
 
+    (*env)->SetIntField(env, jdeck, top_card_idxField, deck->top_card_idx);
+
     jclass cardClass = (*env)->FindClass(env,  "com/lucaslpmoura/JNI_Blackjack/CBlackjack$Card");
 
     jobject jtop_card = (*env)->AllocObject(env, cardClass);
-    convert_card_to_obj(env, deck->cards[0], jtop_card);
+    convert_card_to_obj(env, deck->top_card, jtop_card);
     (*env)->SetObjectField(env, jdeck, top_cardField, jtop_card);
-
-
 
 
     jobjectArray jcards = (*env)->NewObjectArray(env, deck->size, cardClass, NULL);

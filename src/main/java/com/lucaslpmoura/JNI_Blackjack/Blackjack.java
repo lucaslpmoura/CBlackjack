@@ -20,6 +20,7 @@ public class Blackjack {
         String op = "";
         CBlackjack.Action action = CBlackjack.Action.STAND;
         Scanner sc = new Scanner(System.in);
+        print_card(deck.top_card);
 
         while(state == CBlackjack.GameState.NOT_FINISHED){
             System.out.println("DEALER");

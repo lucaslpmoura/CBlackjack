@@ -73,6 +73,7 @@ void *generate_deck(Deck *new_deck) {
 
             new_card->next = new_deck->top_card;
             new_deck->top_card = new_card;
+            new_deck->top_card_idx = i + j;
 
             new_deck->cards[new_deck->size] = new_card;
             new_deck->size++;
@@ -91,6 +92,7 @@ Deck *generate_aces_deck() {
 
             new_card->next = new_deck->top_card;
             new_deck->top_card = new_card;
+            new_deck->top_card_idx = i;
 
             new_deck->cards[new_deck->size] = new_card;
             new_deck->size++;
@@ -101,6 +103,7 @@ Deck *generate_aces_deck() {
 
             new_card->next = new_deck->top_card;
             new_deck->top_card = new_card;
+            new_deck->top_card_idx = i + j;
 
             new_deck->cards[new_deck->size] = new_card;
             new_deck->size++;
@@ -126,6 +129,7 @@ void shuffle_deck(Deck *deck) {
 
     deck->cards[deck->size - 1]->next = NULL;
     deck->top_card = deck->cards[0];
+    deck->top_card_idx = 0;
 }
 
 
@@ -224,6 +228,7 @@ size_t deal_card(Deck *deck, Player *player) {
         return ERR_DECK_EMPTY;
     }
     deck->top_card = deck->top_card->next;
+    deck->top_card_idx++;
     return add_card(player->hand, card, false);
 }
 
@@ -233,6 +238,7 @@ size_t deal_hidden_card(Deck *deck, Player *player) {
         return ERR_DECK_EMPTY;
     }
     deck->top_card = deck->top_card->next;
+    deck->top_card_idx++;
     return add_card(player->hand, card, true);
 }
 

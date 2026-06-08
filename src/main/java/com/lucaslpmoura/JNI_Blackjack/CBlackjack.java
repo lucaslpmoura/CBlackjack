@@ -38,6 +38,8 @@ public class CBlackjack {
         public int size;
         public Card[] cards = new Card[MAX_DECK_SIZE];
         public Card top_card;
+
+        public int top_card_idx;
     }
 
     public static class Hand{

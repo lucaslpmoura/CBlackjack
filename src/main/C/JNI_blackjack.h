@@ -41,6 +41,7 @@ typedef struct{
     size_t size;
     Card *cards[DECK_MAX_SIZE];
     Card *top_card;
+    int top_card_idx;
 } Deck;
 
 typedef struct Hand {
@@ -76,6 +77,8 @@ typedef enum {
 size_t calculate_hand_score(const Hand *hand);
 void initialize_game(Deck *deck, Player *gambler, Player *dealer);
 GameState process_action(Deck *deck, Player *gambler, Player *dealer, Action action);
+
+void print_card(const Card *card);
 
 void free_hand(Hand *hand);
 void free_player(Player *player);
